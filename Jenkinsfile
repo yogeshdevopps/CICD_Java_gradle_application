@@ -2,7 +2,8 @@
       agent any
       environment{
           VERSION = "${env.BUILD_ID}"
-          DOCKER_HOSTED_EP = "15.207.86.32:8083" 
+          DOCKER_HOSTED_EP = "13.234.204.128:8083" 
+          HELM_HOSTED_EP = "13.234.204.128:8081"
       }
       stages{
           stage("Sonar Quality Check"){
