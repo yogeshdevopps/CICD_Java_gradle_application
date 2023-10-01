@@ -35,5 +35,20 @@
                   }
               }
           }
+          stage("Push Helm Charts to Nexus Repo"){
+              steps{
+                script{
+                      dir('kubernetes/'){
+                        withCredentials([string(credentialsId: 'nexus_pass', variable: 'nexus_pass_var')]) {
+                            sh '''
+                            helmchartversion=$(helm show chart myapp/ | grep version | awk '{print $2}')
+                            helm package myapp/
+                            curl -u admin:$nexus_pass_var http://$HELM_HOSTED_EP/repository/helm-hosted/ --upload-file myapp-${helmchartversion}.tgz -v
+                              '''
+                          }   
+                      }
+                  }
+              }
+          }
       }            
   }
