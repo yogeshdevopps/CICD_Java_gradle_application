@@ -1,8 +1,7 @@
   pipeline{
       agent any
       environment{
-          VERSION = "${env.BUILD_ID}"
-          DOCKER_HOSTED_EP = "13.235.91.151:8083" 
+          VERSION = "{env.BUILD_ID}"
       }
       stages{
           stage("Sonar Quality Check"){
@@ -12,7 +11,7 @@
                           sh 'chmod +x gradlew'
                           sh './gradlew sonarqube --info'
                       }
-                      timeout(time: 1, unit: 'MINUTES') {
+                      timeout(time: 15, unit: 'MINUTES') {
                           def qg = waitForQualityGate()
                           if (qg.status != 'OK') {
                               error "Pipeline aborted due to quality gate failure: ${qg.status}"
@@ -21,19 +20,7 @@
                   }
               }
           }
-          stage("Build docker images and push to Nexus"){
-              steps{
-                  script{
-                      withCredentials([string(credentialsId: 'nexus_pass', variable: 'nexus_pass_var')]) {
-                          sh '''
-                          docker build -t $DOCKER_HOSTED_EP/javawebapp:${VERSION} .
-                          docker login -u admin -p $nexus_pass_var $DOCKER_HOSTED_EP
-                          docker push $DOCKER_HOSTED_EP/javawebapp:${VERSION}
-                          docker rmi $DOCKER_HOSTED_EP/javawebapp:${VERSION}
-                          '''
-                      }
-                  }
-              }
-          }
-      }            
-  }
+        }
+
+      
+    }
